@@ -41,8 +41,8 @@ main
   template = args[1];
   if( !is_defined( format ) ){ throw( IllegalArgumentFault, "output extension not specified" ) };
   if( !is_defined( template ) ){ throw( IllegalArgumentFault, "template file not specified" ) };
-  println@Console( "- loading template " + serviceDirectory + sep + "markdown_joliedoc.liquid" )();
-  readFile@File( { .filename = serviceDirectory + sep + "markdown_joliedoc.liquid" } )( renderRequest.template );
+  println@Console( "- loading template " + serviceDirectory + sep + template )();
+  readFile@File( { .filename = serviceDirectory + sep + template } )( renderRequest.template );
   getServiceDirectory@File()( serviceDirectory );
   getFileSeparator@File()( sep );
   getenv@Runtime( "JOLIE_HOME" )( JOLIE_HOME );
