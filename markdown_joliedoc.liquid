@@ -1,0 +1,100 @@
+# {{ result.filename }}
+
+<table>
+  <caption>Service Deployment</caption>
+  <thead>
+    <tr>
+      <th>Port Name</th>
+      <th>Location</th>
+      <th>Protocol</th>
+      <th>Interfaces</th>
+    </tr>
+  </thead>
+  <tbody>{% for port in result.port %}{% if port.documentation %}<tr><td>{{ port.name }} documentation: {{ port.documentation }}</td></tr>{% endif %}
+    <tr>
+      <td>{{ port.name }}</td>
+      <td>{% if port.location %}{{ port.location }}{% else %}-{% endif %}</td>
+      <td>{% if port.protocol %}{{ port.protocol }}{% else %}-{% endif %}</td>
+      <td>{% for interface in port.interface %}<a href="#{{ interface.name }}">{{ interface.name }}</a>{% endfor %}</td>
+    </tr>{% endfor %}
+  </tbody>
+</table>
+
+<h3>List of Available Interfaces</h3>
+{% for port in result.port %}{% for interface in port.interface %}
+<h3 id="{{ interface.name }}">{{ interface.name }}</h3>
+{% if interface.documentation %}
+<pre>
+{{ interface.documentation }}
+</pre>
+{% endif %}
+<table>
+  <thead>
+    <tr>
+      <th>Operation Name</th>
+      <th>Input Type</th>
+      <th>Output Type</th>
+      <th>Faults</th>
+    </tr>
+  </thead>
+  <tbody>{% for operation in interface.operation %}
+    <tr>
+      <td><a href="#{{ operation.name }}">{{ operation.name }}</a></td>
+      <td>{% unless operation.requestType.isNative or operation.requestType.name == "undefined" %}<a href="#{{ operation.requestType.name }}">{% endunless %}{{ operation.requestType.name }}{% unless operation.requestType.isNative %}</a>{% endunless %}</td>
+      <td>{% if operation.responseType %}{% unless operation.responseType.isNative or operation.responseType.name == "undefined" %}<a href="#{{ operation.responseType.name }}">{% endunless %}{{ operation.responseType.name }}{% unless operation.responseType.isNative %}</a>{% endunless %}{% else %} - {% endif %}</td>
+      <td>{% if operation.fault.length == 0 %} - {% else %}{% for fault in operation.fault %}
+        {{ fault.name }}( {{ fault.faultType.name }} ){% if forloop.rindex0 > 0 %} <br> {% endif %}{% endfor %}{% endif %}
+      </td>
+    </tr>{% endfor %}
+  </tbody>
+</table>
+
+### Operation Description
+
+{% for operation in interface.operation %}
+<a id="{{ operation.name }}"></a>
+#### {{ operation.name }}
+{% if operation.documentation %}
+<pre>
+{{ operation.documentation }}
+</pre>{% endif %}
+{% if operation.requestType %}
+{% unless operation.requestType.isNative or operation.requestType.name == "undefined" %}<a id="{{ operation.requestType.name }}"></a>{% endunless %}
+Request type: {{ operation.requestType.name }}
+{% if operation.requestType.documentation %}
+<pre>
+{{ operation.requestType.documentation }}
+</pre>{% endif %}
+{% unless operation.requestType.isNative or operation.requestType.name == "undefined" %}<pre>{{ operation.requestType.code }}</pre>{% endunless %}
+{% endif %}
+{% if operation.responseType %}
+{% unless operation.responseType.isNative or operation.responseType.name == "undefined"%}<a id="{{ operation.responseType.name }}"></a>{% endunless %}
+Response type: {{ operation.responseType.name }}
+{% if operation.responseType.documentation %}
+<pre>
+{{ operation.responseType.documentation }}
+</pre>
+{% endif %}
+{% unless operation.responseType.isNative or operation.responseType.name == "undefined"%}<pre>{{ operation.responseType.code }}</pre>{% endunless %}
+{% endif %}
+{% for fault in operation.fault %}
+Fault {{ fault.name }} with type {{ fault.faultType.name }}
+{% if fault.documentation %}<pre>{{ fault.documentation }}</pre>{% endif %}
+{% unless fault.faultType.isNative or fault.faultType.name == "undefined" %}<pre>{{ fault.faultType.code }}</pre>{% endunless %}
+{% endfor %}
+{% endfor %}
+
+{% if port.subtype %}<h4>Subtypes</h4>
+
+{% for type in port.subtype %}
+{{ type.name }}
+{% if type.documentation %}
+<pre>
+{{ type.documentation }}
+</pre>
+{% endif %}
+<pre>{{ type.code }}</pre>
+{% endfor %}
+{% endif %}
+{% endfor %}
+{% endfor %}
