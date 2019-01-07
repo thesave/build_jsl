@@ -2,7 +2,7 @@
 
 `build_jsl` is a Jolie script that builds the Jolie standard library.
 
-It depends from (liquidService)[https://github.com/thesave/liquidService], which can be installed automatically by running the script `install_dependencies.ol`.
+It depends from [liquidService](https://github.com/thesave/liquidService), which can be installed automatically by running the script `install_dependencies.ol`.
 
 Usage example: 
 ```
