@@ -47,8 +47,6 @@ define resetPort {
 main
 {
   readFile@File( { .filename = "dependencies.json", .format = "json" } )( dependencies );
-  valueToPrettyString@StringUtils( dependencies )( s );
-  println@Console( s )();
   download.format = "binary";
   for ( dependency in dependencies._ ) {
     download.filename = dependency.filename;
