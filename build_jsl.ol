@@ -20,20 +20,20 @@
  *******************************************************************************/
 
 include "console.iol"
-include "jolie_doc.iol"
 include "string_utils.iol"
 include "json_utils.iol"
 include "file.iol"
 include "runtime.iol"
-include "liquid/include/liquid.iol"
+include "include/liquid.iol"
+include "include/joliedoc.iol"
 
 main
 {
   install( default => 
     println@Console( 
-      "\n======================== JOLIE DOC ============================================================\n\n"
-      + "Usage example: jolie -l \"liquid/lib:liquid/lib/*\" build_jsl.ol \".md\" \"markdown_joliedoc.liquid\""
-      + "\n\n===============================================================================================\n" )();
+      "\n=================== BUILD JOLIE STANDARD LIBRARY =================\n\n"
+      + "Usage example: jolie build_jsl.ol \".md\" \"markdown_joliedoc.liquid\""
+      + "\n\n==================================================================\n" )();
     valueToPrettyString@StringUtils( main )( t ); 
     println@Console( t )()
   );
