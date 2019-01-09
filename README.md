@@ -2,7 +2,7 @@
 
 `build_jsl` is a Jolie script that builds the Jolie standard library.
 
-It depends from 
+It depends on
 
 - [liquidService](https://github.com/thesave/liquidService)
 - [joliedocService](https://github.com/thesave/joliedocService)
