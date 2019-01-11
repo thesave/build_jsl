@@ -32,19 +32,26 @@ main
   install( default => 
     println@Console( 
       "\n=================== BUILD JOLIE STANDARD LIBRARY =================\n\n"
-      + "Usage example: jolie build_jsl.ol \".md\" \"markdown_joliedoc.liquid\""
+      + "Usage example: jolie build_jsl.ol \".md\" \"markdown_joliedoc.liquid\" [\"output/folder\"]"
+      + "\n output/folder is optional, the default path workingDirectory/joliedoc is used when missing"
       + "\n\n==================================================================\n" )();
     valueToPrettyString@StringUtils( main )( t ); 
     println@Console( t )()
   );
+  getFileSeparator@File()( sep );
   format = args[0];
   template = args[1];
+  if( is_defined( args[2] ) ){ 
+    outputFolder = args[2]
+  } else { 
+    getServiceDirectory@File()( serviceDirectory );
+    outputFolder = serviceDirectory + sep + "joliedoc"
+  };
   if( !is_defined( format ) ){ throw( IllegalArgumentFault, "output extension not specified" ) };
   if( !is_defined( template ) ){ throw( IllegalArgumentFault, "template file not specified" ) };
-  println@Console( "- loading template " + serviceDirectory + sep + template )();
-  readFile@File( { .filename = serviceDirectory + sep + template } )( renderRequest.template );
-  getServiceDirectory@File()( serviceDirectory );
-  getFileSeparator@File()( sep );
+  toAbsolutePath@File( template )( template );
+  println@Console( "- loading template " + template )();
+  readFile@File( { .filename = template } )( renderRequest.template );
   getenv@Runtime( "JOLIE_HOME" )( JOLIE_HOME );
   if ( !is_defined( JOLIE_HOME ) ){ throw( IOException, "Could not find Jolie install home, JOLIE_HOME undefined." ) };
   with( docRequest ){
@@ -53,10 +60,9 @@ main
     .libraries[#.libraries] = JOLIE_HOME + sep + "javaServices/*";
     .libraries[#.libraries] = JOLIE_HOME + sep + "extensions/*"
   };
-  jolieDocFolder = serviceDirectory + sep + "joliedoc";
-  deleteDir@File( jolieDocFolder )();
-  mkdir@File( jolieDocFolder )();
-  println@Console( "- created folder '" + jolieDocFolder + "' to store the created documentation" )();
+  deleteDir@File( outputFolder )();
+  mkdir@File( outputFolder )();
+  println@Console( "- created folder '" + outputFolder + "' to store the created documentation" )();
   println@Console( "- building the Jolie Documentation from " + docRequest.includes )();
   dirs[ 0 ] = docRequest.includes;
   list@File( { .directory = docRequest.includes, .dirsOnly = true } )( tmp_dirs );
@@ -83,7 +89,7 @@ main
           renderDocument@Liquid( renderRequest )( writeFile.content )
         };
         replaceAll@StringUtils( filename { .regex = "\\.iol", .replacement = "" } )( filename );
-        writeFile.filename = jolieDocFolder + sep + filename + format;
+        writeFile.filename = outputFolder + sep + filename + format;
         writeFile@File( writeFile )()
       } else {
         println@Console( "    - skipped rendering of file '" + filename + "' since it has no ports to document" )()
