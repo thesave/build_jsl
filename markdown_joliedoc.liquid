@@ -1,4 +1,6 @@
-# {{ result.filename }}
+# Include library: {{ result.filename }}
+
+Inclusion code: <code>include "{{result.filename}}"</code>
 
 <table>
   <caption>Service Deployment</caption>
@@ -24,9 +26,7 @@
 {% for port in result.port %}{% for interface in port.interface %}
 <h3 id="{{ interface.name }}">{{ interface.name }}</h3>
 {% if interface.documentation %}
-<pre>
-{{ interface.documentation }}
-</pre>
+Interface documentation: {{ interface.documentation }}
 {% endif %}
 <table>
   <thead>
@@ -41,9 +41,9 @@
     <tr>
       <td><a href="#{{ operation.name }}">{{ operation.name }}</a></td>
       <td>{% unless operation.requestType.isNative or operation.requestType.name == "undefined" %}<a href="#{{ operation.requestType.name }}">{% endunless %}{{ operation.requestType.name }}{% unless operation.requestType.isNative %}</a>{% endunless %}</td>
-      <td>{% if operation.responseType %}{% unless operation.responseType.isNative or operation.responseType.name == "undefined" %}<a href="#{{ operation.responseType.name }}">{% endunless %}{{ operation.responseType.name }}{% unless operation.responseType.isNative %}</a>{% endunless %}{% else %} - {% endif %}</td>
+      <td>{% if operation.responseType %}{% assign isResponseLinkType = operation.responseType.isNative or operation.responseType.name == "undefined" %}{% unless isResponseLinkType %}<a href="#{{ operation.responseType.name }}">{% endunless %}{{ operation.responseType.name }}{% unless isResponseLinkType %}</a>{% endunless %}{% else %} - {% endif %}</td>
       <td>{% if operation.fault.length == 0 %} - {% else %}{% for fault in operation.fault %}
-        {{ fault.name }}( {{ fault.faultType.name }} ){% if forloop.rindex0 > 0 %} <br> {% endif %}{% endfor %}{% endif %}
+        {{ fault.name }}( {% assign isFaultLinkType = fault.faultType.isNative or fault.faultType.name == "undefined" %}{% unless isFaultLinkType %}<a href="#{{ fault.faultType.name }}">{% endunless %}{{ fault.faultType.name }}{% unless isFaultLinkType %}</a>{% endunless %} ){% if forloop.rindex0 > 0 %} <br> {% endif %}{% endfor %}{% endif %}
       </td>
     </tr>{% endfor %}
   </tbody>
@@ -54,44 +54,40 @@
 {% for operation in interface.operation %}
 <a id="{{ operation.name }}"></a>
 #### {{ operation.name }}
-{% if operation.documentation %}
-<pre>
-{{ operation.documentation }}
-</pre>{% endif %}
-{% if operation.requestType %}
+{% if operation.documentation %}Operation documentation: {{ operation.documentation }}{% endif %}
+
+Invocation template: <code>{{operation.name}}{% if port.isOutput %}@{{ port.name }}{% endif %}( request ){% if operation.responseType %}( response ){% endif %}</code>
+
+**Request type**
 {% unless operation.requestType.isNative or operation.requestType.name == "undefined" %}<a id="{{ operation.requestType.name }}"></a>{% endunless %}
-Request type: {{ operation.requestType.name }}
-{% if operation.requestType.documentation %}
-<pre>
-{{ operation.requestType.documentation }}
-</pre>{% endif %}
+Type documentation:{% if operation.requestType.documentation %}{{ operation.requestType.documentation }}{% else %} no documentation provided {% endif %}
 {% unless operation.requestType.isNative or operation.requestType.name == "undefined" %}<pre>{{ operation.requestType.code }}</pre>{% endunless %}
-{% endif %}
+
 {% if operation.responseType %}
+**Response type**
 {% unless operation.responseType.isNative or operation.responseType.name == "undefined"%}<a id="{{ operation.responseType.name }}"></a>{% endunless %}
-Response type: {{ operation.responseType.name }}
-{% if operation.responseType.documentation %}
-<pre>
-{{ operation.responseType.documentation }}
-</pre>
-{% endif %}
+Type documentation:{% if operation.responseType.documentation %}{{ operation.responseType.documentation }}{% else %} no documentation provided {% endif %}
 {% unless operation.responseType.isNative or operation.responseType.name == "undefined"%}<pre>{{ operation.responseType.code }}</pre>{% endunless %}
 {% endif %}
+
+{% if operation.fault %}**Possible faults thrown**{% endif %}
 {% for fault in operation.fault %}
-Fault {{ fault.name }} with type {{ fault.faultType.name }}
-{% if fault.documentation %}<pre>{{ fault.documentation }}</pre>{% endif %}
+
+Fault <code>{{ fault.name }}</code> with type <code>{{ fault.faultType.name }}</code>
+{% if fault.documentation %}Fault documentation: {{ fault.documentation }}{% endif %}
+Fault-handling install template: <code>install ( {{ fault.name }} => /* error-handling code */ )</code>
 {% unless fault.faultType.isNative or fault.faultType.name == "undefined" %}<pre>{{ fault.faultType.code }}</pre>{% endunless %}
 {% endfor %}
+---
 {% endfor %}
 
 {% if port.subtype %}<h4>Subtypes</h4>
 
 {% for type in port.subtype %}
+<a id="{{ type.name }}"></a>
 {{ type.name }}
 {% if type.documentation %}
-<pre>
 {{ type.documentation }}
-</pre>
 {% endif %}
 <pre>{{ type.code }}</pre>
 {% endfor %}

@@ -58,24 +58,37 @@ main
   mkdir@File( jolieDocFolder )();
   println@Console( "- created folder '" + jolieDocFolder + "' to store the created documentation" )();
   println@Console( "- building the Jolie Documentation from " + docRequest.includes )();
-  list@File( { .directory = docRequest.includes, .regex = ".+\\.iol" } )( files );
-  for ( docRequest.file in files.result ) {
-    println@Console( "    + of file " + docRequest.file )();
-    scope( a ){
-      install( default => valueToPrettyString@StringUtils( a )( t ); println@Console( t )() );
-      getDocumentation@JolieDoc( docRequest )( data.result )
-    };
-    // valueToPrettyString@StringUtils( data )( s ); println@Console( s )();
-    getJsonString@JsonUtils( data )( renderRequest.data );
-    // println@Console( renderRequest.data )();
-    renderRequest.format = "json";
-    scope( a ){
-      install( default => valueToPrettyString@StringUtils( a )( t ); println@Console( t )() );
-      renderDocument@Liquid( renderRequest )( writeFile.content )
-    };
-    replaceAll@StringUtils( docRequest.file { .regex = "\\.iol", .replacement = "" } )( filename );
-    writeFile.filename = jolieDocFolder + sep + filename + format;
-    writeFile@File( writeFile )()
+  dirs[ 0 ] = docRequest.includes;
+  list@File( { .directory = docRequest.includes, .dirsOnly = true } )( tmp_dirs );
+  for ( dir in tmp_dirs.result ) { dirs[ #dirs ] = dir };
+  for ( dir in dirs ) {
+    absolutePathDir = docRequest.includes;
+    if( dir != docRequest.includes ){ absolutePathDir = absolutePathDir + sep + dir };
+    list@File( { .directory = absolutePathDir, .regex = ".+\\.iol" } )( files );
+    for ( filename in files.result ) {
+      docRequest.file = absolutePathDir + sep + filename;
+      println@Console( "    + of file " + docRequest.file )();
+      scope( a ){
+        install( default => valueToPrettyString@StringUtils( a )( t ); println@Console( t )() );
+        getDocumentation@JolieDoc( docRequest )( data.result )
+      };
+      if( #data.result.port > 0 ){
+        if ( dir != docRequest.includes ){ data.result.filename = dir + sep + data.result.filename };
+        // valueToPrettyString@StringUtils( data )( s ); println@Console( s )();
+        getJsonString@JsonUtils( data )( renderRequest.data );
+        // println@Console( renderRequest.data )();
+        renderRequest.format = "json";
+        scope( a ){
+          install( default => valueToPrettyString@StringUtils( a )( t ); println@Console( t )() );
+          renderDocument@Liquid( renderRequest )( writeFile.content )
+        };
+        replaceAll@StringUtils( filename { .regex = "\\.iol", .replacement = "" } )( filename );
+        writeFile.filename = jolieDocFolder + sep + filename + format;
+        writeFile@File( writeFile )()
+      } else {
+        println@Console( "    - skipped rendering of file '" + filename + "' since it has no ports to document" )()
+      }
+    } 
   };
   println@Console( "Done" )()
 }
