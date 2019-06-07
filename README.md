@@ -5,7 +5,6 @@
 It depends on
 
 - [liquidService](https://github.com/thesave/liquidService)
-- [joliedocService](https://github.com/thesave/joliedocService)
  
  the dependencies are automatically installed by running `jolie install_dependencies.ol` in the root of the repository.
 
