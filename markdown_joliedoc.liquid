@@ -1,6 +1,6 @@
 # Include library: {{ result.filename }}
 
-Inclusion code: <pre>include "{{result.filename}}"</pre>
+Inclusion code: <pre>include "{{ result.filename }}"</pre>
 
 <table>
   <caption>Service Deployment</caption>
@@ -65,22 +65,25 @@ Invocation template:
 
 Type: {{ operation.requestType.name }}
 
-Type documentation:{% if operation.requestType.documentation %}{{ operation.requestType.documentation }}{% else %} no documentation provided {% endif %}
+{%comment%}Type documentation:{% if operation.requestType.documentation %}{{ operation.requestType.documentation }}{% else %} no documentation provided {% endif %}{% endcomment %}
 {% unless operation.requestType.isNative or operation.requestType.name == "undefined" %}<pre>{{ operation.requestType.code }}</pre>{% endunless %}
+
+{{ operation.requestType | useTemplate: "typeRender" }}
 
 {% if operation.responseType %}
 <h4{% unless operation.responseType.isNative or operation.responseType.name == "undefined" %} id="{{ operation.responseType.name }}"{% endunless %}>Response type</h4>
 
 Type: {{ operation.responseType.name }}
 
-Type documentation:{% if operation.responseType.documentation %}{{ operation.responseType.documentation }}{% else %} no documentation provided {% endif %}
+{% comment %} Type documentation:{% if operation.responseType.documentation %}{{ operation.responseType.documentation }}{% else %} no documentation provided {% endif %} {% endcomment %}
 {% unless operation.responseType.isNative or operation.responseType.name == "undefined"%}<pre>{{ operation.responseType.code }}</pre>{% endunless %}
+
+{{ operation.responseType | useTemplate: "typeRender" }}
 
 {% endif %}
 
 {% if operation.fault %}<h4>Possible faults thrown</h4>{% endif %}
 {% for fault in operation.fault %}
-
 
 Fault <code>{{ fault.name }}</code> with type <code>{{ fault.faultType.name }}</code>
 {% if fault.documentation %}Fault documentation: {{ fault.documentation }}{% endif %}
@@ -98,6 +101,7 @@ Fault-handling install template:
 {{ type.documentation }}
 {% endif %}
 <pre>{{ type.code }}</pre>
+{{ type | useTemplate: "typeRender" }}
 {% endfor %}
 {% endif %}
 {% endfor %}

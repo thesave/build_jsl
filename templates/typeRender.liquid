@@ -1,0 +1,8 @@
+<code>{{ name }} : {{ rootType }}</code> {% if documentation.size > 0 %}: {{ documentation }} {% endif %}
+{% if subtype.size > 0 %}
+<ul>
+{% for s in subtype %}
+  <li>{{ s | useTemplate: "typeRender" }}</li>
+{% endfor %}
+</ul>
+{% endif %}
