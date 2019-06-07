@@ -1,4 +1,3 @@
 [ 
-  { "repository" : "thesave/liquidService", "filename" : "liquidService.zip" }, 
-  { "repository" : "thesave/joliedocService", "filename" : "joliedocService.zip" }
+  { "repository" : "thesave/liquidService", "filename" : "liquidService.zip" }
 ]
